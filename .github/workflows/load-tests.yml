@@ -1,0 +1,136 @@
+name: k6 Load Tests
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'backend/**'
+      - 'load-tests/**'
+  pull_request:
+    branches: [ master, main ]
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Test type: baseline, stress, spike, soak, all-apis'
+        required: true
+        default: 'baseline'
+
+jobs:
+  load-test:
+    name: k6 Load Tests - ${{ github.event.inputs.test_type || 'baseline' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package.json
+
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm install --prefer-offline || npm install
+
+      - name: Start Backend Server
+        working-directory: backend
+        run: |
+          echo "PORT=5000" > .env
+          node server.js &
+          sleep 8
+          curl -f http://localhost:5000/api/properties && echo "Backend ready" || exit 1
+        env:
+          PORT: 5000
+          MONGO_URI: ""
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg \
+            --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" \
+            | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update && sudo apt-get install -y k6
+          k6 version
+
+      - name: Create Reports Directory
+        run: mkdir -p load-tests/reports
+
+      - name: Run Baseline Load Test (100 VUs, 1 minute)
+        if: ${{ github.event.inputs.test_type == 'baseline' || github.event.inputs.test_type == '' || github.event_name != 'workflow_dispatch' }}
+        working-directory: load-tests
+        run: |
+          k6 run baseline.js \
+            --out json=reports/baseline-results.json \
+            -e BASE_URL=http://localhost:5000/api \
+            -e BUYER_EMAIL=buyer@propai.com \
+            -e BUYER_PASSWORD=password
+        continue-on-error: true
+
+      - name: Run All APIs Test (50 VUs, 2 minutes)
+        if: ${{ github.event.inputs.test_type == 'all-apis' || github.event_name != 'workflow_dispatch' }}
+        working-directory: load-tests
+        run: |
+          k6 run all-apis.js \
+            --out json=reports/all-apis-results.json \
+            -e BASE_URL=http://localhost:5000/api
+        continue-on-error: true
+
+      - name: Run Stress Test
+        if: ${{ github.event.inputs.test_type == 'stress' }}
+        working-directory: load-tests
+        run: |
+          k6 run stress.js \
+            --out json=reports/stress-results.json \
+            -e BASE_URL=http://localhost:5000/api
+        continue-on-error: true
+
+      - name: Run Spike Test
+        if: ${{ github.event.inputs.test_type == 'spike' }}
+        working-directory: load-tests
+        run: |
+          k6 run spike.js \
+            --out json=reports/spike-results.json \
+            -e BASE_URL=http://localhost:5000/api
+        continue-on-error: true
+
+      - name: Generate HTML Summary Report
+        working-directory: load-tests
+        run: |
+          echo "<!DOCTYPE html><html><head><title>PropAI Load Test Report</title>" > reports/index.html
+          echo "<style>body{font-family:Arial;background:#0a0a1a;color:#e5e7eb;padding:2rem;}</style></head><body>" >> reports/index.html
+          echo "<h1>PropAI k6 Load Test Report</h1>" >> reports/index.html
+          echo "<p>Run: ${{ github.run_number }} | Branch: ${{ github.ref_name }} | $(date)</p>" >> reports/index.html
+          echo "<h2>Test Results</h2><ul>" >> reports/index.html
+          for f in reports/*.json; do
+            echo "<li><strong>$(basename $f)</strong>: $(wc -c < $f) bytes</li>" >> reports/index.html
+          done
+          echo "</ul></body></html>" >> reports/index.html
+        continue-on-error: true
+
+      - name: Upload Load Test Reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-reports-${{ github.run_number }}
+          path: load-tests/reports/
+          retention-days: 30
+
+      - name: Print Load Test Summary
+        if: always()
+        run: |
+          echo "=========================================="
+          echo "  PropAI k6 Load Test Complete"
+          echo "  Test Type: ${{ github.event.inputs.test_type || 'baseline + all-apis' }}"
+          echo "  Run: ${{ github.run_number }}"
+          echo "=========================================="
+          echo ""
+          echo "Performance Benchmarks:"
+          echo "  Excellent:  Avg <100ms, P95 <300ms"
+          echo "  Good:       Avg <300ms, P95 <800ms"
+          echo "  Acceptable: Avg <800ms, P95 <2000ms"
+          echo "  Poor:       Avg >800ms, P95 >2000ms"
