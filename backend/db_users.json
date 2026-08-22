@@ -1,0 +1,26 @@
+[
+  {
+    "id": "pkv9yzq",
+    "email": "buyer@propai.com",
+    "password": "password",
+    "name": "Bob Buyer",
+    "role": "Buyer",
+    "createdAt": "2026-08-18T05:56:15.128Z"
+  },
+  {
+    "id": "9nq9096",
+    "email": "seller@propai.com",
+    "password": "password",
+    "name": "Sam Seller",
+    "role": "Seller",
+    "createdAt": "2026-08-18T05:56:15.128Z"
+  },
+  {
+    "id": "d4h5kek",
+    "email": "admin@propai.com",
+    "password": "password",
+    "name": "Alice Admin",
+    "role": "Admin",
+    "createdAt": "2026-08-18T05:56:15.128Z"
+  }
+]

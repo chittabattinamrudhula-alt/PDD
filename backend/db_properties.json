@@ -1,0 +1,199 @@
+[
+  {
+    "id": "o7bc71q",
+    "title": "Skyline Luxury Penthouse",
+    "description": "Stunning top-floor apartment with panoramic skyline views, fully integrated automation, and private fitness studio access.",
+    "location": "Downtown",
+    "sqft": 1800,
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "age": 3,
+    "condition": "Excellent",
+    "amenities": [
+      "pool",
+      "gym",
+      "smart_home"
+    ],
+    "listingPrice": 890000,
+    "ownerName": "Satoshi Nakamoto",
+    "titleVerified": true,
+    "imageUrl": "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80",
+    "blockchainTxHash": "00b56dadf4505d3a60a17b1e8f0546eef4774a3bb71e5743f3f87fe5a06a8f0d",
+    "blockchainBlockIndex": 1,
+    "valuation": {
+      "estimatedValue": 1033068,
+      "confidenceScore": 94,
+      "pricePerSqft": 574,
+      "growthRatePercent": 7
+    },
+    "recommendation": {
+      "action": "BUY",
+      "rating": "Buy",
+      "explanation": "Property is priced slightly below market value (14% discount). Favorable investment."
+    },
+    "anomalies": {
+      "anomalyScore": 0,
+      "flags": [],
+      "status": "Clear",
+      "isSuspicious": false
+    },
+    "createdAt": "2026-08-18T05:13:23.971Z"
+  },
+  {
+    "id": "sxh08kl",
+    "title": "Oakridge Family Residence",
+    "description": "Spacious suburban home featuring a private landscaped garden, renovated chef's kitchen, and a double detached garage.",
+    "location": "Suburbs",
+    "sqft": 2400,
+    "bedrooms": 4,
+    "bathrooms": 3,
+    "age": 8,
+    "condition": "Good",
+    "amenities": [
+      "garden",
+      "garage"
+    ],
+    "listingPrice": 530000,
+    "ownerName": "Alice Cooper",
+    "titleVerified": true,
+    "imageUrl": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80",
+    "blockchainTxHash": "006ea9265a953a367407113ac766d370be151ee7defb15fd17442a1daf10d984",
+    "blockchainBlockIndex": 2,
+    "valuation": {
+      "estimatedValue": 651168,
+      "confidenceScore": 93,
+      "pricePerSqft": 271,
+      "growthRatePercent": 4
+    },
+    "recommendation": {
+      "action": "BUY",
+      "rating": "Strong Buy",
+      "explanation": "Property is undervalued by 19% compared to local fair market estimates. Strong upside potential."
+    },
+    "anomalies": {
+      "anomalyScore": 0,
+      "flags": [],
+      "status": "Clear",
+      "isSuspicious": false
+    },
+    "createdAt": "2026-08-18T05:13:23.973Z"
+  },
+  {
+    "id": "pwkwy7a",
+    "title": "Sapphire Shore Beach Resort",
+    "description": "Premium beachfront escape with direct access to private sands, high ceilings, and beautiful resort amenities.",
+    "location": "Beachfront",
+    "sqft": 1200,
+    "bedrooms": 1,
+    "bathrooms": 1.5,
+    "age": 12,
+    "condition": "Excellent",
+    "amenities": [
+      "pool",
+      "gym",
+      "garden"
+    ],
+    "listingPrice": 850000,
+    "ownerName": "Vitalik Buterin",
+    "titleVerified": true,
+    "imageUrl": "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=800&q=80",
+    "blockchainTxHash": "002edbea98b530d5f06cfb4d362238ca43b38ae57812bd8a6575ba95c630636f",
+    "blockchainBlockIndex": 3,
+    "valuation": {
+      "estimatedValue": 864800,
+      "confidenceScore": 93,
+      "pricePerSqft": 721,
+      "growthRatePercent": 7
+    },
+    "recommendation": {
+      "action": "HOLD",
+      "rating": "Hold / Fair Value",
+      "explanation": "Property is priced accurately within fair market value. Recommended for long-term hold or owner-occupant acquisition."
+    },
+    "anomalies": {
+      "anomalyScore": 0,
+      "flags": [],
+      "status": "Clear",
+      "isSuspicious": false
+    },
+    "createdAt": "2026-08-18T05:13:23.974Z"
+  },
+  {
+    "id": "2fglitv",
+    "title": "Suspicious Meadow Manor",
+    "description": "Huge rural property with historical build qualities. Price set for extremely quick sale by remote agent.",
+    "location": "Rural",
+    "sqft": 4500,
+    "bedrooms": 9,
+    "bathrooms": 1,
+    "age": 45,
+    "condition": "Needs Work",
+    "amenities": [],
+    "listingPrice": 65000,
+    "ownerName": "Anonymous Agent",
+    "titleVerified": false,
+    "imageUrl": "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80",
+    "blockchainTxHash": "",
+    "blockchainBlockIndex": -1,
+    "valuation": {
+      "estimatedValue": 424700,
+      "confidenceScore": 86,
+      "pricePerSqft": 94,
+      "growthRatePercent": 2.5
+    },
+    "recommendation": {
+      "action": "BUY",
+      "rating": "Strong Buy",
+      "explanation": "Property is undervalued by 85% compared to local fair market estimates. Strong upside potential."
+    },
+    "anomalies": {
+      "anomalyScore": 55,
+      "flags": [
+        "Price is extremely low relative to local market specs (possible bait-and-switch scam).",
+        "Property ownership records not checked or verified on-chain."
+      ],
+      "status": "Moderate Warning",
+      "isSuspicious": true
+    },
+    "createdAt": "2026-08-18T05:13:23.974Z"
+  },
+  {
+    "id": "nhs7im6",
+    "title": "Grandview Highrise Apartment",
+    "description": "Sleek metropolitan condo located in the heart of Uptown. Modern finishes, custom lighting, and automated temperature controls.",
+    "location": "Uptown",
+    "sqft": 1050,
+    "bedrooms": 2,
+    "bathrooms": 2,
+    "age": 2,
+    "condition": "Excellent",
+    "amenities": [
+      "smart_home",
+      "gym"
+    ],
+    "listingPrice": 380000,
+    "ownerName": "Grace Hopper",
+    "titleVerified": true,
+    "imageUrl": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=800&q=80",
+    "blockchainTxHash": "00f03b6a9805cd4e5e94f409884f6b4ea9069e9d3da9c3a677bf2025e6442c2f",
+    "blockchainBlockIndex": 4,
+    "valuation": {
+      "estimatedValue": 506063,
+      "confidenceScore": 95,
+      "pricePerSqft": 482,
+      "growthRatePercent": 4
+    },
+    "recommendation": {
+      "action": "BUY",
+      "rating": "Strong Buy",
+      "explanation": "Property is undervalued by 25% compared to local fair market estimates. Strong upside potential."
+    },
+    "anomalies": {
+      "anomalyScore": 0,
+      "flags": [],
+      "status": "Clear",
+      "isSuspicious": false
+    },
+    "createdAt": "2026-08-18T05:13:23.977Z"
+  }
+]
