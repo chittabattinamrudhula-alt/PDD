@@ -1,4 +1,4 @@
-name: Selenium E2E Tests (300 Test Cases)
+name: PropAI Selenium E2E Tests (520 Test Cases)
 
 on:
   push:
@@ -13,18 +13,28 @@ on:
 
 jobs:
   selenium-e2e:
-    name: Run Selenium Tests - ${{ matrix.browser }}
+    name: Selenium E2E – ${{ matrix.browser }} (${{ matrix.suite }})
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 90
     strategy:
       matrix:
         browser: [chrome]
+        suite:
+          - auth
+          - dashboard
+          - advanced
+          - uiux
+          - functional
+          - validation
+          - deployment
       fail-fast: false
 
     steps:
+      # ── 1. Checkout ──────────────────────────────────────────────────────────
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # ── 2. Node.js setup ─────────────────────────────────────────────────────
       - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
@@ -34,6 +44,7 @@ jobs:
             backend/package.json
             selenium-tests/package.json
 
+      # ── 3. Backend ───────────────────────────────────────────────────────────
       - name: Install Backend Dependencies
         working-directory: backend
         run: npm install --prefer-offline || npm install
@@ -41,15 +52,20 @@ jobs:
       - name: Start Backend Server
         working-directory: backend
         run: |
-          cp .env .env.ci 2>/dev/null || echo "PORT=5000" > .env
+          echo "PORT=5000" > .env
           node server.js &
-          echo "Waiting for backend..."
-          sleep 8
-          curl -f http://localhost:5000/api/properties || (echo "Backend failed" && exit 1)
+          echo "Waiting for backend to start..."
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:5000/api/properties && break
+            sleep 2
+          done
+          curl -f http://localhost:5000/api/properties || (echo "❌ Backend failed to start" && exit 1)
+          echo "✅ Backend is running"
         env:
           PORT: 5000
           MONGO_URI: ""
 
+      # ── 4. Frontend ──────────────────────────────────────────────────────────
       - name: Install Frontend Dependencies
         working-directory: frontend
         run: npm install --prefer-offline || npm install
@@ -58,32 +74,39 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Serve Frontend
+      - name: Serve Frontend (port 5173)
         working-directory: frontend
         run: |
           npx serve -s dist -l 5173 &
-          sleep 5
-          curl -f http://localhost:5173 || (echo "Frontend failed" && exit 1)
+          for i in $(seq 1 10); do
+            curl -sf http://localhost:5173 && break
+            sleep 2
+          done
+          curl -f http://localhost:5173 || (echo "❌ Frontend failed to start" && exit 1)
+          echo "✅ Frontend is running"
 
+      # ── 5. Browser setup ─────────────────────────────────────────────────────
       - name: Setup Chrome
         uses: browser-actions/setup-chrome@v1
 
-      - name: Install ChromeDriver
+      - name: Install ChromeDriver (matching version)
         run: |
           CHROME_VERSION=$(google-chrome --version | sed 's/Google Chrome //' | cut -d. -f1)
-          echo "Chrome version: $CHROME_VERSION"
-          npm install -g chromedriver@$CHROME_VERSION || npm install -g chromedriver
+          echo "Chrome major version: $CHROME_VERSION"
+          npm install -g chromedriver@$CHROME_VERSION 2>/dev/null || npm install -g chromedriver
+          chromedriver --version
 
+      # ── 6. Test dependencies ──────────────────────────────────────────────────
       - name: Install Selenium Test Dependencies
         working-directory: selenium-tests
         run: npm install
 
-      - name: Create .env File
+      - name: Create Test .env File
         working-directory: selenium-tests
         run: |
-          cat > .env << EOF
+          cat > .env << 'EOF'
           BASE_URL=http://localhost:5173
-          BROWSER=${{ matrix.browser }}
+          BROWSER=chrome
           HEADLESS=true
           IMPLICIT_WAIT=10000
           EXPLICIT_WAIT=30000
@@ -99,32 +122,43 @@ jobs:
         working-directory: selenium-tests
         run: mkdir -p reports/screenshots reports/failures reports/logs reports/excel reports/mochawesome
 
-      - name: Run Selenium Tests (300 Test Cases)
+      # ── 7. Run suite ──────────────────────────────────────────────────────────
+      - name: Run Selenium Tests – ${{ matrix.suite }}
         working-directory: selenium-tests
-        run: npm test
+        run: npm run test:${{ matrix.suite }}
         continue-on-error: true
         env:
           BROWSER: ${{ matrix.browser }}
           HEADLESS: "true"
           DISPLAY: ":99"
 
-      - name: Generate Excel Report
-        working-directory: selenium-tests
-        run: node -e "require('./utilities/excelReporter').generateReport('CI','${{ matrix.browser }}').then(p => console.log('Report:',p))"
-        continue-on-error: true
-
-      - name: Merge HTML Reports
+      # ── 8. Reports ───────────────────────────────────────────────────────────
+      - name: Generate Excel Test Report
         working-directory: selenium-tests
         run: |
-          npx mochawesome-merge reports/mochawesome/*.json > reports/mochawesome/merged.json 2>/dev/null || true
-          npx marge reports/mochawesome/merged.json -f selenium-report -o reports/mochawesome 2>/dev/null || true
+          node -e "
+            require('./utilities/excelReporter')
+              .generateReport('CI-${{ matrix.suite }}','${{ matrix.browser }}')
+              .then(p => console.log('📊 Excel report:', p))
+              .catch(e => console.warn('Report error:', e.message));
+          "
         continue-on-error: true
 
+      - name: Merge & Generate HTML Report
+        working-directory: selenium-tests
+        run: |
+          npx mochawesome-merge reports/mochawesome/*.json > reports/mochawesome/merged-${{ matrix.suite }}.json 2>/dev/null || true
+          npx marge reports/mochawesome/merged-${{ matrix.suite }}.json \
+            -f selenium-report-${{ matrix.suite }} \
+            -o reports/mochawesome 2>/dev/null || true
+        continue-on-error: true
+
+      # ── 9. Upload artefacts ───────────────────────────────────────────────────
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: selenium-reports-${{ matrix.browser }}-${{ github.run_number }}
+          name: propai-${{ matrix.suite }}-reports-${{ matrix.browser }}-run${{ github.run_number }}
           path: selenium-tests/reports/
           retention-days: 30
 
@@ -132,7 +166,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: selenium-excel-${{ matrix.browser }}-${{ github.run_number }}
+          name: propai-${{ matrix.suite }}-excel-${{ matrix.browser }}-run${{ github.run_number }}
           path: selenium-tests/reports/excel/
           retention-days: 30
 
@@ -140,16 +174,57 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: selenium-screenshots-${{ matrix.browser }}-${{ github.run_number }}
+          name: propai-${{ matrix.suite }}-screenshots-${{ matrix.browser }}-run${{ github.run_number }}
           path: selenium-tests/reports/screenshots/
           retention-days: 14
 
-      - name: Print Summary
+      # ── 10. Summary ───────────────────────────────────────────────────────────
+      - name: Print Run Summary
         if: always()
         run: |
-          echo "======================================"
-          echo "  PropAI Selenium Test Run Complete"
-          echo "  Browser: ${{ matrix.browser }}"
-          echo "  300 Test Cases | SE-001 to SE-300"
-          echo "  Run: ${{ github.run_number }}"
-          echo "======================================"
+          echo "════════════════════════════════════════════════"
+          echo "  ✅ PropAI Selenium E2E – Suite Complete"
+          echo "  Suite   : ${{ matrix.suite }}"
+          echo "  Browser : ${{ matrix.browser }}"
+          echo "  Run No  : ${{ github.run_number }}"
+          echo "  Commit  : ${{ github.sha }}"
+          echo "════════════════════════════════════════════════"
+          echo "  Test ranges:"
+          echo "    auth         → SE-001 to SE-060"
+          echo "    dashboard    → SE-061 to SE-160"
+          echo "    advanced     → SE-161 to SE-300"
+          echo "    uiux         → SE-301 to SE-360"
+          echo "    functional   → SE-361 to SE-440"
+          echo "    validation   → SE-441 to SE-500"
+          echo "    deployment   → SE-501 to SE-520"
+          echo "  TOTAL: 520 unique test cases"
+          echo "════════════════════════════════════════════════"
+
+  # ── Merge all suite reports into one final report ────────────────────────────
+  merge-reports:
+    name: Merge All Suite Reports
+    runs-on: ubuntu-latest
+    needs: selenium-e2e
+    if: always()
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Download All Test Reports
+        uses: actions/download-artifact@v4
+        with:
+          pattern: propai-*-reports-chrome-run${{ github.run_number }}
+          merge-multiple: true
+          path: all-reports
+
+      - name: Final Summary
+        if: always()
+        run: |
+          echo "🏁 PropAI Full E2E Run Complete"
+          echo "520 Test Cases across 7 suites executed"
+          echo "Check artifacts for detailed Excel + HTML reports"

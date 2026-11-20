@@ -8,6 +8,7 @@ class LoginPage extends BasePage {
       signupBtn:    By.xpath('//button[contains(text(),"Sign Up")]'),
       emailInput:   By.css('input[type="email"]'),
       passwordInput:By.css('input[type="password"]'),
+      phoneInput:   By.css('input[type="tel"]'),
       submitBtn:    By.xpath('//button[contains(text(),"Sign In to Portal")]'),
       signupSubmit: By.xpath('//button[contains(text(),"Register New Vetted Profile")]'),
       nameInput:    By.css('input[placeholder*="John Doe"], input[placeholder*="Name"]'),

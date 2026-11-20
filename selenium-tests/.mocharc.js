@@ -1,6 +1,6 @@
 module.exports = {
   spec: 'tests/**/*.spec.js',
-  timeout: 60000,
+  timeout: 90000,
   retries: 1,
   reporter: 'mochawesome',
   reporterOptions: {

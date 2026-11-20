@@ -1,21 +1,23 @@
 {
   "name": "propai-selenium-tests",
-  "version": "1.0.0",
-  "description": "PropAI Web E2E Automation Framework - Selenium WebDriver",
+  "version": "2.0.0",
+  "description": "PropAI Web E2E Automation Framework - Selenium WebDriver (520 Test Cases)",
   "scripts": {
     "test": "mocha --config .mocharc.js --exit",
     "test:auth": "mocha tests/auth/*.spec.js --config .mocharc.js --exit",
     "test:dashboard": "mocha tests/dashboard/*.spec.js --config .mocharc.js --exit",
-    "test:properties": "mocha tests/properties/*.spec.js --config .mocharc.js --exit",
-    "test:valuation": "mocha tests/valuation/*.spec.js --config .mocharc.js --exit",
-    "test:ledger": "mocha tests/ledger/*.spec.js --config .mocharc.js --exit",
-    "test:bookings": "mocha tests/bookings/*.spec.js --config .mocharc.js --exit",
-    "test:profile": "mocha tests/profile/*.spec.js --config .mocharc.js --exit",
-    "test:navigation": "mocha tests/navigation/*.spec.js --config .mocharc.js --exit",
-    "test:chrome": "BROWSER=chrome npm test",
-    "test:firefox": "BROWSER=firefox npm test",
-    "test:edge": "BROWSER=edge npm test",
-    "report": "node utilities/reportGenerator.js"
+    "test:advanced": "mocha tests/advanced/*.spec.js --config .mocharc.js --exit",
+    "test:uiux": "mocha tests/ui-ux/*.spec.js --config .mocharc.js --exit",
+    "test:functional": "mocha tests/functional/*.spec.js --config .mocharc.js --exit",
+    "test:validation": "mocha tests/validation/*.spec.js --config .mocharc.js --exit",
+    "test:deployment": "mocha tests/deployment/*.spec.js --config .mocharc.js --exit",
+    "test:all": "mocha \"tests/**/*.spec.js\" --config .mocharc.js --exit",
+    "test:chrome": "cross-env BROWSER=chrome npm test",
+    "test:firefox": "cross-env BROWSER=firefox npm test",
+    "test:edge": "cross-env BROWSER=edge npm test",
+    "test:headless": "cross-env HEADLESS=true npm test",
+    "test:new-suites": "mocha \"tests/ui-ux/*.spec.js\" \"tests/functional/*.spec.js\" \"tests/validation/*.spec.js\" \"tests/deployment/*.spec.js\" --config .mocharc.js --exit",
+    "report": "node utilities/excelReporter.js"
   },
   "dependencies": {
     "selenium-webdriver": "^4.21.0"
@@ -31,6 +33,7 @@
     "dotenv": "^16.4.5",
     "uuid": "^10.0.0",
     "moment": "^2.30.1",
+    "cross-env": "^7.0.3",
     "chromedriver": "^126.0.0",
     "geckodriver": "^4.4.3",
     "msedgedriver": "^126.0.0"
