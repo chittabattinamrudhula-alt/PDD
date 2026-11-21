@@ -1,0 +1,47 @@
+{
+  "name": "propai-automation",
+  "version": "3.0.0",
+  "description": "PropAI Enterprise Selenium E2E Framework — 400+ Live GitHub Pages Test Cases",
+  "main": "index.js",
+  "scripts": {
+    "test":              "mocha --config .mocharc.js --exit",
+    "test:all":          "mocha \"tests/**/*.spec.js\" --config .mocharc.js --exit",
+    "test:auth":         "mocha tests/auth/*.spec.js --config .mocharc.js --exit",
+    "test:navigation":   "mocha tests/navigation/*.spec.js --config .mocharc.js --exit",
+    "test:ui":           "mocha tests/ui/*.spec.js --config .mocharc.js --exit",
+    "test:forms":        "mocha tests/forms/*.spec.js --config .mocharc.js --exit",
+    "test:crud":         "mocha tests/crud/*.spec.js --config .mocharc.js --exit",
+    "test:validation":   "mocha tests/validation/*.spec.js --config .mocharc.js --exit",
+    "test:error":        "mocha tests/error/*.spec.js --config .mocharc.js --exit",
+    "test:session":      "mocha tests/session/*.spec.js --config .mocharc.js --exit",
+    "test:upload":       "mocha tests/upload/*.spec.js --config .mocharc.js --exit",
+    "test:accessibility":"mocha tests/accessibility/*.spec.js --config .mocharc.js --exit",
+    "test:responsive":   "mocha tests/responsive/*.spec.js --config .mocharc.js --exit",
+    "test:performance":  "mocha tests/performance/*.spec.js --config .mocharc.js --exit",
+    "test:regression":   "mocha tests/regression/*.spec.js --config .mocharc.js --exit",
+    "test:chrome":       "cross-env BROWSER=chrome npm test",
+    "test:headless":     "cross-env HEADLESS=true npm test",
+    "report:excel":      "node utils/excelReporter.js",
+    "report:html":       "node utils/htmlReporter.js",
+    "report:summary":    "node utils/summaryGenerator.js"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.21.0"
+  },
+  "devDependencies": {
+    "mocha":                      "^10.4.0",
+    "chai":                       "^4.4.1",
+    "mochawesome":                "^7.1.3",
+    "mochawesome-merge":          "^4.3.0",
+    "mochawesome-report-generator":"^6.2.0",
+    "exceljs":                    "^4.4.0",
+    "winston":                    "^3.13.0",
+    "dotenv":                     "^16.4.5",
+    "uuid":                       "^10.0.0",
+    "moment":                     "^2.30.1",
+    "cross-env":                  "^7.0.3",
+    "chromedriver":               "*",
+    "minimist":                   "^1.2.8"
+  },
+  "engines": { "node": ">=18.0.0" }
+}
